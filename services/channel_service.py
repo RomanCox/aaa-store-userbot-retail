@@ -1,84 +1,24 @@
 import os
+import asyncio
 from telethon import events
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
+from config import DOWNLOAD_DIR
+from services.today_here_tomorrow_there_price_service import process_today_here_tomorrow_there_price
 
-
-async def get_recent_messages(client, channel, days=2):
+async def setup_channel_listener(client, channel_id, download_dir):
     """
-    Получает сообщения за последние N дней (по умолчанию: вчера + сегодня)
+    Регистрирует обработчик новых сообщений в канале.
+    При появлении файла с именем, начинающимся на "Apple", скачивает как new_* и обрабатывает.
     """
-    tz = ZoneInfo("Europe/Moscow")
-    now = datetime.now(tz)
-
-    # начало периода (вчера 00:00)
-    start_date = (now - timedelta(days=days-1)).replace(
-        hour=0, minute=0, second=0, microsecond=0
-    )
-
-    print(f"Ищем сообщения с {start_date}")
-
-    messages = []
-
-    async for message in client.iter_messages(channel):
-        if not message.date:
-            continue
-
-        msg_date = message.date.astimezone(tz)
-
-        if msg_date < start_date:
-            break  # дальше уже старые сообщения
-
-        messages.append(message)
-
-    return messages
-
-
-async def find_and_download_apple_xlsx(messages, download_dir):
-    """
-    Ищет и скачивает файл, название которого начинается с 'Apple'
-    """
-    for msg in messages:
-        if not msg.document:
-            continue
-
-        file = msg.file
-        name = file.name or ""
-
-        if name.lower().startswith("apple") and name.endswith(".xlsx"):
-            print(f"📄 Найден нужный файл: {name}")
-
-            path = await msg.download_media(
-                file=os.path.join(download_dir, name)
-            )
-
-            print(f"⬇️ Скачан: {path}")
-            return path
-
-    print("❌ Apple XLSX файл не найден")
-    return None
-
-
-def setup_channel_listener(client, channel_id, download_dir):
     @client.on(events.NewMessage(chats=channel_id))
     async def handler(event):
-        msg = event.message
+        if event.message.document:
+            file_name = event.message.file.name
+            if file_name and file_name.startswith("Apple"):
+                # Скачиваем с префиксом new_
+                new_file_path = os.path.join(download_dir, f"new_{file_name}")
+                await event.message.download_media(file=new_file_path)
+                print(f"📥 Скачан новый Apple-файл: {new_file_path}")
+                await process_today_here_tomorrow_there_price(client, new_file_path)
 
-        if not msg.document:
-            return
-
-        file = msg.file
-        name = (file.name or "").lower()
-
-        # фильтр: Apple + xlsx
-        if name.startswith("apple") and name.endswith(".xlsx"):
-            print(f"📥 Новый прайс найден: {file.name}")
-
-            path = await msg.download_media(
-                file=os.path.join(download_dir, file.name)
-            )
-
-            print(f"⬇️ Скачан файл: {path}")
-
-            # тут можешь сразу запускать пайплайн
-            # await process_price_file(path)
+    # Бесконечно держим слушателя (но не блокируем остальной код)
+    await asyncio.Event().wait()  # вечное ожидание
