@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ### 5. Запуск бота в фоне
 ```bash
-nohup python main.py > bot.log 2>&1 &
+nohup /var/www/h99447/data/bots/aaa-store-userbot-retail/venv/bin/python /var/www/h99447/data/bots/aaa-store-userbot-retail/main.py > bot.log 2>&1 &
 ```
 
 ### 6. Проверка работы бота
