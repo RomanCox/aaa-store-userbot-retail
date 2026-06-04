@@ -13,4 +13,8 @@ downloads/
 
 # logs
 logs.txt
-errors.txt
+errors.txt.idea/
+venv/
+*.session
+downloads/
+__pycache__/
