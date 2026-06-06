@@ -18,7 +18,7 @@ cd ~/bots/aaa-store-userbot-retail
 
 ### 3. Активировать виртуальное окружение
 ```bash
-source /home/mobileti/virtualenv/repositories/aaa-store-userbot-retail/3.10/bin/activate
+source venv/bin/activate
 ```
 
 ### 4. Установить зависимости (если нужно)
