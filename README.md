@@ -13,7 +13,7 @@ ssh mobileti@93.125.99.154
 
 ### 2. Перейти в директорию проекта
 ```bash
-cd ~/repositories/aaa-store-userbot-retail
+cd ~/bots/aaa-store-userbot-retail
 ```
 
 ### 3. Активировать виртуальное окружение
