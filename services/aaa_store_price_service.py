@@ -66,18 +66,15 @@ async def process_aaa_store_price(client):
     # 2️⃣ Сравниваем с предыдущим файлом
     standard_path = os.path.join(DOWNLOAD_DIR, STANDARD_FILE_NAME)
     
-    if os.path.exists(standard_path):
-        if get_file_hash(standard_path) == get_file_hash(new_file_path):
-            print("✅ Файл не изменился — удаляем новый")
-            os.remove(new_file_path)
-            return
-        else:
-            print("🔄 Файл изменился — заменяем старый")
+    if has_file_changed(new_file_path, standard_path):
+        print("🔄 Файл изменился или новый — заменяем старый")
+        if os.path.exists(standard_path):
             os.remove(standard_path)
-            os.rename(new_file_path, standard_path)
-    else:
         os.rename(new_file_path, standard_path)
-        print("💾 Сохраняем новый файл как актуальный")
+    else:
+        print("✅ Файл не изменился — удаляем новый")
+        os.remove(new_file_path)
+        return
 
     # -----------------------------
     # 3️⃣ Отправляем файл в админ-бота
