@@ -23,5 +23,6 @@ logs.txt
 errors.txt.idea/
 venv/
 *.session
+*.session-journal
 downloads/
 __pycache__/
