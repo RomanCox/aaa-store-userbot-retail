@@ -149,8 +149,8 @@ async def main():
         await setup_apple_inside_channel_forwarder(client, source_channel, dest_channel)
         print("🍎 Слушаем канал для Apple-постов...")
 
-        asyncio.create_task(poll_new_messages(client, source_channel, dest_channel, interval=POLL_INTERVAL_SECONDS))
-        print("🔄 Запущен периодический опрос канала...")
+        # asyncio.create_task(poll_new_messages(client, source_channel, dest_channel, interval=POLL_INTERVAL_SECONDS))
+        # print("🔄 Запущен периодический опрос канала...")
 
         asyncio.create_task(periodic_price1())
 

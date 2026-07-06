@@ -18,6 +18,8 @@ cd ~/bots/aaa-store-userbot-retail
 
 ### 3. Активировать виртуальное окружение
 ```bash
+git fetch
+git pull origin main
 source venv/bin/activate
 ```
 
