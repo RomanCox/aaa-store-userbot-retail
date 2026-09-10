@@ -22,4 +22,7 @@ DOWNLOAD_DIR = "downloads"
 NEW_FILE_NAME = "new_Все товары.xlsx"
 STANDARD_FILE_NAME = "Все товары.xlsx"
 
+# Папка, куда складываются копии всех файлов, отправленных (загруженных) в бота
+UPLOADED_FILES_DIR = "temp"
+
 POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", 30))
