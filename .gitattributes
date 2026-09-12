@@ -1,1 +1,11 @@
+# нормализуем всё текстовое к LF в репозитории
 * text=auto eol=lf
+
+# бинарники не трогать
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary
+*.zip binary
+*.session binary
