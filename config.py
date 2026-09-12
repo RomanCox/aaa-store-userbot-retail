@@ -22,7 +22,7 @@ DOWNLOAD_DIR = "downloads"
 NEW_FILE_NAME = "new_Все товары.xlsx"
 STANDARD_FILE_NAME = "Все товары.xlsx"
 
-# Папка, куда складываются копии всех файлов, отправленных (загруженных) в бота
-UPLOADED_FILES_DIR = "temp"
+# Сколько суток хранить в DOWNLOAD_DIR старые версии прайсов (с меткой даты/времени в имени)
+PRICE_HISTORY_MAX_AGE_DAYS = 3
 
 POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", 30))

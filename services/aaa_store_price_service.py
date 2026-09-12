@@ -1,11 +1,18 @@
 import os
 import asyncio
 from datetime import datetime, timezone
-from utils.file_utils import has_file_changed
+from utils.file_utils import (
+    has_file_changed,
+    add_timestamp_to_filename,
+    find_latest_versioned_file,
+    cleanup_old_versioned_files,
+)
 from services.bot_service import open_admin_panel, click_button_by_text, send_price_file
-from config import DOWNLOAD_DIR, STANDARD_FILE_NAME, NEW_FILE_NAME, PARTNER_BOT
+from config import DOWNLOAD_DIR, STANDARD_FILE_NAME, NEW_FILE_NAME, PARTNER_BOT, PRICE_HISTORY_MAX_AGE_DAYS
 
 MAX_FILE_AGE_SECONDS = 300
+# Имя файла без расширения, по которому ищутся версии этого прайса в DOWNLOAD_DIR
+PRICE_PREFIX = os.path.splitext(STANDARD_FILE_NAME)[0]
 
 async def process_aaa_store_price(client):
     """Периодическая задача для поставщика 1 (aaa-store)"""
@@ -63,14 +70,14 @@ async def process_aaa_store_price(client):
         return
 
     # -----------------------------
-    # 2️⃣ Сравниваем с предыдущим файлом
-    standard_path = os.path.join(DOWNLOAD_DIR, STANDARD_FILE_NAME)
-    
-    if has_file_changed(new_file_path, standard_path):
-        print("🔄 Файл изменился или новый — заменяем старый")
-        if os.path.exists(standard_path):
-            os.remove(standard_path)
-        os.rename(new_file_path, standard_path)
+    # 2️⃣ Сравниваем с последней сохранённой версией прайса в DOWNLOAD_DIR
+    latest_path = find_latest_versioned_file(DOWNLOAD_DIR, PRICE_PREFIX)
+
+    if has_file_changed(new_file_path, latest_path):
+        print("🔄 Файл изменился или новый — сохраняем новую версию с меткой даты/времени")
+        versioned_name = add_timestamp_to_filename(STANDARD_FILE_NAME)
+        versioned_path = os.path.join(DOWNLOAD_DIR, versioned_name)
+        os.rename(new_file_path, versioned_path)
     else:
         print("✅ Файл не изменился — удаляем новый")
         os.remove(new_file_path)
@@ -80,6 +87,10 @@ async def process_aaa_store_price(client):
     # 3️⃣ Отправляем файл в админ-бота
     admin_bot = await open_admin_panel(client)
     if await click_button_by_text(client, admin_bot, "📤 Загрузить aaa-store прайс"):
-        await send_price_file(client, admin_bot, standard_path)
+        await send_price_file(client, admin_bot, versioned_path)
     else:
         print("❌ Не удалось нажать кнопку для aaa-store")
+
+    # -----------------------------
+    # 4️⃣ Чистим версии прайса старше PRICE_HISTORY_MAX_AGE_DAYS суток
+    cleanup_old_versioned_files(DOWNLOAD_DIR, PRICE_PREFIX, PRICE_HISTORY_MAX_AGE_DAYS)

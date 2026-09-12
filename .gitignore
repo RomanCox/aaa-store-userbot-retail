@@ -18,9 +18,6 @@ __pycache__/
 # downloads
 downloads/
 
-# archive of files uploaded to the bot
-temp/
-
 # logs
 logs.txt
 errors.txt.idea/
