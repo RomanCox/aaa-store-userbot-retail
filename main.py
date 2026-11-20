@@ -154,11 +154,8 @@ async def main():
 
         asyncio.create_task(periodic_price1())
 
-        # Бесконечное ожидание (чтобы не завершиться)
-        try:
-            await asyncio.Event().wait()
-        except asyncio.CancelledError:
-            print("🛑 Остановка задач...")
+        await client.run_until_disconnected()
+        raise SystemExit("Соединение с Telegram закрыто. Юзербот завершает работу.")
 
 if __name__ == "__main__":
     try:
